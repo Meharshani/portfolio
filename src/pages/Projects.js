@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import Lightbox from 'react-image-lightbox';
-import 'react-image-lightbox/style.css'; // Lightbox styles
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 const projects = [
   {
@@ -29,11 +28,9 @@ const projects = [
 function Projects() {
   const [isOpen, setIsOpen] = useState(false);
   const [currentImages, setCurrentImages] = useState([]);
-  const [photoIndex, setPhotoIndex] = useState(0);
 
   const openLightbox = (images) => {
     setCurrentImages(images);
-    setPhotoIndex(0);
     setIsOpen(true);
   };
 
@@ -75,16 +72,9 @@ function Projects() {
       {/* Lightbox */}
       {isOpen && (
         <Lightbox
-          mainSrc={currentImages[photoIndex]}
-          nextSrc={currentImages[(photoIndex + 1) % currentImages.length]}
-          prevSrc={currentImages[(photoIndex + currentImages.length - 1) % currentImages.length]}
-          onCloseRequest={() => setIsOpen(false)}
-          onMovePrevRequest={() =>
-            setPhotoIndex((photoIndex + currentImages.length - 1) % currentImages.length)
-          }
-          onMoveNextRequest={() =>
-            setPhotoIndex((photoIndex + 1) % currentImages.length)
-          }
+          open={isOpen}
+          close={() => setIsOpen(false)}
+          slides={currentImages.map((src) => ({ src }))}
         />
       )}
 
