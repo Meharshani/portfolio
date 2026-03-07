@@ -364,7 +364,7 @@ function Projects() {
                   >
                     <img
                       src={src}
-                      alt={`${gridProject.title} image ${index + 1}`}
+                      alt={`${gridProject.title} screenshot ${index + 1}`}
                       className="w-full h-32 sm:h-40 object-cover rounded-lg shadow-sm group-hover:shadow-md group-hover:opacity-90 transition"
                       loading="lazy"
                     />
