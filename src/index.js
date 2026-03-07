@@ -3,6 +3,23 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { mhrsolutionlogo } from './images/image';
+
+// Set site favicon to mhrsolutionlogo at runtime
+const setFavicon = () => {
+  const head = document.head || document.getElementsByTagName('head')[0];
+  if (!head) return;
+
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    head.appendChild(link);
+  }
+  link.href = mhrsolutionlogo;
+};
+
+setFavicon();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

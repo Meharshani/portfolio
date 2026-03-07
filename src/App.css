@@ -18,9 +18,19 @@
 }
 
 .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.02em;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  object-fit: cover;
 }
 
 .nav-links {
