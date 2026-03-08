@@ -17,18 +17,20 @@ function Contact() {
   };
 
   const handleSubmit = (e) => {
-    // Netlify form submit
     e.preventDefault();
+  
     const formData = new FormData(e.target);
-    fetch('/', {
-      method: 'POST',
-      body: formData,
+  
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString(),
     })
       .then(() => {
         setSubmitted(true);
-        setForm({ name: '', email: '', message: '' });
+        setForm({ name: "", email: "", message: "" });
       })
-      .catch((error) => alert('Form submission failed: ' + error));
+      .catch((error) => alert("Form submission failed: " + error));
   };
 
   const handlePhoneClick = (e) => {
@@ -133,6 +135,7 @@ function Contact() {
           name="contact" 
           method="POST" 
           data-netlify="true" 
+          netlify
           onSubmit={handleSubmit} 
           className="flex flex-col gap-4"
         >
