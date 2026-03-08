@@ -3,7 +3,7 @@ import { FaEnvelope, FaPhone, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [submitted, setSubmitted] = useState(false);
+  const [submitted] = useState(false);
 
   const [showPhoneOptions, setShowPhoneOptions] = useState(false);
 
