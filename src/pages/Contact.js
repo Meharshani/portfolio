@@ -14,22 +14,7 @@ function Contact() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.target);
-
-    fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData).toString(),
-    })
-      .then(() => {
-        setSubmitted(true);
-        setForm({ name: '', email: '', message: '' });
-      })
-      .catch((error) => alert('Form submission failed: ' + error));
-  };
+ 
 
   const handlePhoneClick = (e) => {
     e.preventDefault();
@@ -100,8 +85,7 @@ function Contact() {
           method="POST"
           data-netlify="true"
           className="flex flex-col gap-4"
-          // onSubmit={handleSubmit}
-        >
+         >
           {/* hidden input for Netlify */}
           <input type="hidden" name="form-name" value="contact" />
 
