@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+  poweredByHeader: false,
+  compress: true,
+  turbopack: {
+    root: import.meta.dirname,
+  },
 };
 
 export default nextConfig;
