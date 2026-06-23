@@ -9,16 +9,42 @@ import { GlassCard } from "@/components/ui/GlassCard";
 
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStatus("sending");
-    // Firebase-ready: replace with Firestore or Cloud Function submission
-    await new Promise((r) => setTimeout(r, 800));
-    setStatus("sent");
-    setForm({ name: "", email: "", phone: "", message: "" });
-    setTimeout(() => setStatus("idle"), 4000);
+    setError("");
+    setSending(true);
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append("form-name", "contact");
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("phone", form.phone);
+      formData.append("message", form.message);
+
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setForm({ name: "", email: "", phone: "", message: "" });
+        setTimeout(() => setSubmitted(false), 5000);
+      } else {
+        setError("Failed to send message. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -105,7 +131,28 @@ export function Contact() {
 
           <AnimatedItem className="lg:col-span-3">
             <GlassCard hover={false} className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-5">
+              {submitted && (
+                <p className="mb-4 text-center font-semibold text-green-400">
+                  ✓ Message sent successfully!
+                </p>
+              )}
+              {error && (
+                <p className="mb-4 text-center font-semibold text-red-400">{error}</p>
+              )}
+
+              <form
+                name="contact"
+                method="POST"
+                onSubmit={handleSubmit}
+                className="space-y-5"
+              >
+                <input type="hidden" name="form-name" value="contact" />
+                <p className="hidden">
+                  <label>
+                    Don&apos;t fill this out: <input name="bot-field" />
+                  </label>
+                </p>
+
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-foreground">
@@ -113,6 +160,7 @@ export function Contact() {
                     </label>
                     <input
                       id="name"
+                      name="name"
                       required
                       value={form.name}
                       onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -126,6 +174,7 @@ export function Contact() {
                     </label>
                     <input
                       id="phone"
+                      name="phone"
                       type="tel"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -140,6 +189,7 @@ export function Contact() {
                   </label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     required
                     value={form.email}
@@ -154,6 +204,7 @@ export function Contact() {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
                     required
                     rows={5}
                     value={form.message}
@@ -166,12 +217,10 @@ export function Contact() {
                   type="submit"
                   size="lg"
                   className="w-full"
-                  disabled={status === "sending"}
+                  disabled={sending}
                 >
-                  {status === "sending" ? (
+                  {sending ? (
                     "Sending..."
-                  ) : status === "sent" ? (
-                    "Message Sent!"
                   ) : (
                     <>
                       Send Message
