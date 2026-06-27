@@ -24,8 +24,9 @@ export function Contact() {
       formData.append("email", form.email);
       formData.append("phone", form.phone);
       formData.append("message", form.message);
+      formData.append("bot-field", "");
 
-      const response = await fetch("/", {
+      const response = await fetch("/__forms.html", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString(),
