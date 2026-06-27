@@ -9,7 +9,6 @@ import { GlassCard } from "@/components/ui/GlassCard";
 
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
-  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
 
@@ -33,9 +32,7 @@ export function Contact() {
       });
 
       if (response.ok) {
-        setSubmitted(true);
-        setForm({ name: "", email: "", phone: "", message: "" });
-        setTimeout(() => setSubmitted(false), 5000);
+        window.location.href = "https://mhrsolution.online/?success=true";
       } else {
         setError("Failed to send message. Please try again.");
       }
@@ -131,11 +128,6 @@ export function Contact() {
 
           <AnimatedItem className="lg:col-span-3">
             <GlassCard hover={false} className="p-8">
-              {submitted && (
-                <p className="mb-4 text-center font-semibold text-green-400">
-                  ✓ Message sent successfully!
-                </p>
-              )}
               {error && (
                 <p className="mb-4 text-center font-semibold text-red-400">{error}</p>
               )}
@@ -143,6 +135,8 @@ export function Contact() {
               <form
                 name="contact"
                 method="POST"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
                 onSubmit={handleSubmit}
                 className="space-y-5"
               >

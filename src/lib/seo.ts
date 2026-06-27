@@ -27,7 +27,7 @@ export const defaultMetadata: Metadata = {
     description: SITE.description,
     images: [
       {
-        url: "/opengraph-image",
+        url: `${SITE.url}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: "MHR Solution - Website Development Company Pakistan",
@@ -38,7 +38,7 @@ export const defaultMetadata: Metadata = {
     card: "summary_large_image",
     title: "MHR Solution | Website Development Company Pakistan",
     description: SITE.description,
-    images: ["/opengraph-image"],
+    images: [`${SITE.url}/opengraph-image`],
   },
   robots: {
     index: true,
