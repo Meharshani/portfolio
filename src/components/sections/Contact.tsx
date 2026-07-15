@@ -20,13 +20,14 @@ export function Contact() {
     try {
       const formData = new URLSearchParams();
       formData.append("form-name", "contact");
+      formData.append("subject", "New website enquiry — MHR Solution");
       formData.append("name", form.name);
       formData.append("email", form.email);
       formData.append("phone", form.phone);
       formData.append("message", form.message);
       formData.append("bot-field", "");
 
-       const response = await fetch("/__forms.html", {
+      const response = await fetch("/__forms.html", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString(),
@@ -142,9 +143,14 @@ export function Contact() {
                 className="space-y-5"
               >
                 <input type="hidden" name="form-name" value="contact" />
-                <p className="hidden">
+                <input
+                  type="hidden"
+                  name="subject"
+                  value="New website enquiry — MHR Solution"
+                />
+                <p className="hidden" aria-hidden="true">
                   <label>
-                    Don&apos;t fill this out: <input name="bot-field" />
+                    Don&apos;t fill this out: <input name="bot-field" tabIndex={-1} autoComplete="off" />
                   </label>
                 </p>
 
