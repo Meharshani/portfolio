@@ -2,23 +2,49 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
+// For mobile navigation, anchor tag with href="#section" should work if:
+// 1. The target element's id matches the href value WITHOUT THE #
+// 2. You are not interfering with scroll/overlay styles (backdrop-blur etc. can mask content)
+// 3. You are not replacing the anchor <a> with <Link> (Next.js <Link> only supports navigation for actual pages, not in-page hash links)
+// 4. You are not wrapping the anchor in a <form> or similar tag that absorbs or interrupts clicks
+
+// To force scroll for in-page navigation, handle the click manually and close the menu.
+// This solution enhances anchor default and works on all browsers/SPA:
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Handler to support scrolling to section and closing nav
+  function handleMobileNavClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const el = document.getElementById(href.replace(/^#/, ""));
+      if (el) {
+        // Use scrollIntoView for smoother experience and compatibility
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      setMobileOpen(false);
+    } else {
+      // For real pages (not sections), fallback to router navigation (should be rare here)
+      setMobileOpen(false);
+      router.push(href);
+    }
+  }
 
   return (
     <header
@@ -82,32 +108,37 @@ export function Navbar() {
         </div>
       </nav>
 
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden border-b border-white/10 bg-background/95 backdrop-blur-xl lg:hidden"
-          >
-            <div className="flex flex-col gap-1 px-4 py-4">
+      {mobileOpen && (
+        <div className="overflow-hidden border-b border-white/10 bg-background/95 backdrop-blur-xl lg:hidden">
+          <div className="flex flex-col gap-1 px-4 py-4">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={e => handleMobileNavClick(e, link.href)}
                   className="rounded-lg px-4 py-3 text-base font-medium text-muted transition-colors hover:bg-white/5 hover:text-foreground"
                 >
                   {link.label}
                 </a>
               ))}
-              <Button href="#contact" className="mt-2 w-full" onClick={() => setMobileOpen(false)}>
+              <Button
+                href="#contact"
+                className="mt-2 w-full"
+                onClick={e => {
+                  // Ensure anchor scroll and close on mobile
+                  if (typeof window !== "undefined") {
+                    e.preventDefault();
+                    const el = document.getElementById("contact");
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    setMobileOpen(false);
+                  }
+                }}
+              >
                 Get Free Quote
               </Button>
             </div>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
     </header>
   );
 }

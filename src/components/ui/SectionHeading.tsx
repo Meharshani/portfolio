@@ -76,6 +76,7 @@ export function AnimatedSection({ children, className, id }: AnimatedSectionProp
       whileInView="visible"
       viewport={{ once: true, margin: "-60px" }}
       variants={containerVariants}
+      style={{ scrollMarginTop: "5rem" }}
       className={className}
     >
       {children}

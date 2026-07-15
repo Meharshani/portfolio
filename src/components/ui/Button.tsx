@@ -43,7 +43,10 @@ export function Button({ variant = "primary", size = "md", className, href, ...p
 
   if (href) {
     const isExternal = href.startsWith("http") || href.startsWith("tel:") || href.startsWith("mailto:");
-    if (isExternal) {
+    const isHashLink = href.startsWith("#");
+    if (isExternal || isHashLink) {
+      // Use native <a> for external links and hash anchor links (in-page navigation)
+      // Next.js <Link> doesn't support hash anchor navigation
       return <a href={href} className={classes} {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)} />;
     }
     return <Link href={href} className={classes} {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)} />;
