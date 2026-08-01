@@ -264,7 +264,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <p className="text-sm text-muted">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <button
@@ -280,7 +280,7 @@ export default function LoginPage() {
                 {isSignUp ? "Sign In" : "Sign Up"}
               </button>
             </p>
-          </div>
+          </div> */}
         </GlassCard>
 
         {/* Footer note */}
