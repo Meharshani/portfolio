@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, User, LogOut } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { useTheme } from "@/components/providers/ThemeProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,12 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut, loading: authLoading } = useAuth();
   const router = useRouter();
+  const isLoggedIn = !authLoading && Boolean(user);
+  const visibleNavLinks = NAV_LINKS.filter((link) => link.href !== "/teaching" || isLoggedIn);
+
+  const resolveHref = (href: string) => (href.startsWith("#") ? `/${href}` : href);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -33,18 +39,19 @@ export function Navbar() {
   function handleMobileNavClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) {
     if (href.startsWith("#")) {
       e.preventDefault();
-      const el = document.getElementById(href.replace(/^#/, ""));
-      if (el) {
-        // Use scrollIntoView for smoother experience and compatibility
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
       setMobileOpen(false);
-    } else {
-      // For real pages (not sections), fallback to router navigation (should be rare here)
-      setMobileOpen(false);
-      router.push(href);
+      router.push(`/${href}`);
+      return;
     }
+
+    setMobileOpen(false);
+    router.push(href);
   }
+
+  const handleSignOut = async () => {
+    await signOut();
+    setMobileOpen(false);
+  };
 
   return (
     <header
@@ -66,10 +73,10 @@ export function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-8 lg:flex">
-          {NAV_LINKS.map((link) => (
+          {visibleNavLinks.map((link) => (
             <a
               key={link.href}
-              href={link.href}
+              href={resolveHref(link.href)}
               className="text-sm font-medium text-muted transition-colors hover:text-brand-400"
             >
               {link.label}
@@ -85,9 +92,28 @@ export function Navbar() {
           >
             {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-          <Button href="#contact" size="sm">
-            Get Free Quote
-          </Button>
+          {authLoading ? (
+            <div className="w-8 h-8 animate-pulse bg-white/10 rounded-full" />
+          ) : user ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-500/10 text-brand-400 text-sm font-medium">
+                <User size={16} />
+                <span>{user.email?.split("@")[0] || "User"}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                aria-label="Sign out"
+              >
+                <LogOut size={16} />
+              </Button>
+            </div>
+          ) : (
+            <Button href="/login" size="sm" variant="outline">
+              Sign In
+            </Button>
+          )}
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
@@ -111,7 +137,7 @@ export function Navbar() {
       {mobileOpen && (
         <div className="overflow-hidden border-b border-white/10 bg-background/95 backdrop-blur-xl lg:hidden">
           <div className="flex flex-col gap-1 px-4 py-4">
-              {NAV_LINKS.map((link) => (
+              {visibleNavLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -121,21 +147,42 @@ export function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <Button
-                href="#contact"
-                className="mt-2 w-full"
-                onClick={e => {
-                  // Ensure anchor scroll and close on mobile
-                  if (typeof window !== "undefined") {
-                    e.preventDefault();
-                    const el = document.getElementById("contact");
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    setMobileOpen(false);
-                  }
-                }}
-              >
-                Get Free Quote
-              </Button>
+              <div className="mt-4 border-t border-white/10 pt-4 space-y-2">
+                {authLoading ? (
+                  <div className="flex justify-center py-2">
+                    <div className="w-6 h-6 animate-spin border-2 border-brand-500 border-t-transparent rounded-full" />
+                  </div>
+                ) : user ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-brand-500/10 text-brand-400">
+                      <User size={20} />
+                      <div>
+                        <p className="font-medium">{user.email?.split("@")[0] || "User"}</p>
+                        <p className="text-xs text-muted">{user.email}</p>
+                      </div>
+                    </div>
+                    <Button href="/teaching" className="w-full" variant="secondary">
+                      Teaching Dashboard
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut size={18} className="mr-2" />
+                      Sign Out
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    href="/login"
+                    className="w-full"
+                    variant="outline"
+                  >
+                    Sign In
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         )}

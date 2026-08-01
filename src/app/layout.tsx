@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -10,12 +10,6 @@ import {
   getWebsiteSchema,
 } from "@/lib/seo";
 import "./globals.css";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
 
 export const metadata: Metadata = defaultMetadata;
 
@@ -27,7 +21,7 @@ export default function RootLayout({
   const schemas = [getOrganizationSchema(), getLocalBusinessSchema(), getWebsiteSchema()];
 
   return (
-    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className="h-full" suppressHydrationWarning>
       <head>
         {schemas.map((schema, i) => (
           <script
@@ -37,7 +31,7 @@ export default function RootLayout({
           />
         ))}
       </head>
-      <body className="min-h-full flex flex-col antialiased">
+      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
         {/* Netlify form detection */}
         {/* <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
           <input type="hidden" name="form-name" value="contact" />
@@ -47,9 +41,11 @@ export default function RootLayout({
           <textarea name="message" />
         </form> */}
         <ThemeProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
